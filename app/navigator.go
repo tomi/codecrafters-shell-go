@@ -22,7 +22,9 @@ func (n *Navigator) ChangeDirectory(dir string) error {
 		return fmt.Errorf("path is empty")
 	}
 
-	if !path.IsAbs(dir) {
+	if dir == "~" {
+		dir = os.Getenv("HOME")
+	} else if !path.IsAbs(dir) {
 		dir = path.Join(n.CurrentDir, dir)
 	}
 
