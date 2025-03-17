@@ -23,7 +23,7 @@ func (n *Navigator) ChangeDirectory(dir string) error {
 	}
 
 	if !path.IsAbs(dir) {
-		return fmt.Errorf("path is not absolute: %s", dir)
+		dir = path.Join(n.CurrentDir, dir)
 	}
 
 	info, err := os.Stat(dir)
