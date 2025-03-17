@@ -23,7 +23,8 @@ func main() {
 		"exit": exitCommand,
 		"echo": echoCommand,
 		"type": typeCommand,
-		"pwd":  func(command Command) { navigator.PrintWorkingDirectory() },
+		"pwd":  pwdCommand,
+		"cd":   cdCommand,
 	}
 
 	for {
@@ -105,4 +106,32 @@ func runExecutable(exe ResolvedExecutable, command Command) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()
+}
+
+func pwdCommand(_ Command) {
+	navigator.PrintWorkingDirectory()
+}
+
+func cdCommand(command Command) {
+	if len(command.Args) == 0 {
+		fmt.Printf("cd: Expected argument\n")
+		return
+	}
+
+	dir := command.Args[0]
+	err := navigator.ChangeDirectory(dir)
+	if errors.Is(err, ErrNotFound) {
+		fmt.Printf("cd: %s: No such file or directory\n", dir)
+		return
+	}
+
+	if errors.Is(err, ErrNotADirectory) {
+		fmt.Printf("cd: %s: Not a directory\n", dir)
+		return
+	}
+
+	if err != nil {
+		fmt.Printf("cd: %s: Unexpected error: %v\n", dir, err)
+		return
+	}
 }
