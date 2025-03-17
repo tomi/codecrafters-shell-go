@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -68,7 +69,19 @@ func typeCommand(command Command) {
 
 	if _, found := builtinsByName[commandToCheck]; found {
 		fmt.Printf("%s is a shell builtin\n", commandToCheck)
-	} else {
-		fmt.Printf("%s: not found\n", commandToCheck)
+		return
 	}
+
+	resolved, err := ResolveExecutable(commandToCheck)
+	if err != nil && !errors.Is(err, ErrNotFound) {
+		fmt.Printf("error resolving executable: %v\n", err)
+		os.Exit(1)
+	}
+
+	if err != nil {
+		fmt.Printf("%s: not found\n", commandToCheck)
+		return
+	}
+
+	fmt.Printf("%s is %s\n", commandToCheck, resolved.Path)
 }
