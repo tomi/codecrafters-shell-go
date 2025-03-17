@@ -15,12 +15,15 @@ type Command struct {
 }
 
 var builtinsByName = map[string]func(Command){}
+var navigator *Navigator
 
 func main() {
+	navigator = MakeNavigator()
 	builtinsByName = map[string]func(Command){
 		"exit": exitCommand,
 		"echo": echoCommand,
 		"type": typeCommand,
+		"pwd":  func(command Command) { navigator.PrintWorkingDirectory() },
 	}
 
 	for {
