@@ -12,12 +12,15 @@ type Command struct {
 	Args []string
 }
 
-var builtinsByName = map[string]func(Command){
-	"exit": exitCommand,
-	"echo": echoCommand,
-}
+var builtinsByName = map[string]func(Command){}
 
 func main() {
+	builtinsByName = map[string]func(Command){
+		"exit": exitCommand,
+		"echo": echoCommand,
+		"type": typeCommand,
+	}
+
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
 
@@ -53,4 +56,19 @@ func exitCommand(_ Command) {
 
 func echoCommand(command Command) {
 	fmt.Println(strings.Join(command.Args, " "))
+}
+
+func typeCommand(command Command) {
+	var commandToCheck string
+	if len(command.Args) > 0 {
+		commandToCheck = command.Args[0]
+	} else {
+		commandToCheck = ""
+	}
+
+	if _, found := builtinsByName[commandToCheck]; found {
+		fmt.Printf("%s is a shell builtin\n", commandToCheck)
+	} else {
+		fmt.Printf("%s: not found\n", commandToCheck)
+	}
 }
