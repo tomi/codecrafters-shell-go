@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -27,12 +28,22 @@ func main() {
 
 		command := promptCommand()
 		commandFn, found := builtinsByName[command.Name]
-		if !found {
+		if found {
+			commandFn(command)
+			continue
+		}
+
+		executable, err := ResolveExecutable(command.Name)
+		if err != nil && !errors.Is(err, ErrNotFound) {
+			fmt.Printf("error resolving executable: %v\n", err)
+			os.Exit(1)
+		}
+		if err != nil {
 			fmt.Println(command.Name + ": command not found")
 			continue
 		}
 
-		commandFn(command)
+		runExecutable(executable, command)
 	}
 }
 
@@ -84,4 +95,11 @@ func typeCommand(command Command) {
 	}
 
 	fmt.Printf("%s is %s\n", commandToCheck, resolved.Path)
+}
+
+func runExecutable(exe ResolvedExecutable, command Command) {
+	cmd := exec.Command(exe.Name, command.Args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
 }
