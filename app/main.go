@@ -13,13 +13,18 @@ func main() {
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
 
-		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "error reading command: %v\n", err)
-			os.Exit(1)
-		}
+		command := promptCommand()
 
-		// Remove trailing newline
-		fmt.Println(command[:len(command)-1] + ": command not found")
+		fmt.Println(command + ": command not found")
 	}
+}
+
+func promptCommand() string {
+	command, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error reading command: %v\n", err)
+		os.Exit(1)
+	}
+
+	return command[:len(command)-1]
 }
