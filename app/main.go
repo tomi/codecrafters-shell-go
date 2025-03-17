@@ -12,21 +12,23 @@ type Command struct {
 	Args []string
 }
 
+var builtinsByName = map[string]func(Command){
+	"exit": exitCommand,
+	"echo": echoCommand,
+}
+
 func main() {
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
 
 		command := promptCommand()
-		switch command.Name {
-		case "exit":
-			exitCommand(command)
-
-		case "echo":
-			echoCommand(command)
-
-		default:
+		commandFn, found := builtinsByName[command.Name]
+		if !found {
 			fmt.Println(command.Name + ": command not found")
+			continue
 		}
+
+		commandFn(command)
 	}
 }
 
