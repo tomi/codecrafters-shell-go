@@ -4,6 +4,14 @@ import (
 	"fmt"
 )
 
+type ParserQuoteState int
+
+const (
+	ParserQuoteStateNone ParserQuoteState = iota
+	ParserQuoteStateInSingleQuote
+	ParserQuoteStateInDoubleQuote
+)
+
 func ParseInput(input string) (Command, error) {
 	if len(input) == 0 {
 		return Command{}, fmt.Errorf("empty input")
@@ -47,19 +55,33 @@ func consumeWord(input []rune) (string, []rune) {
 		return "", consumed
 	}
 
-	inQuote := false
+	quoteState := ParserQuoteStateNone
 	isEscaped := false
-	quote := rune(0)
 	word := []rune{}
 	idx := 0
 
 	for idx < len(consumed) {
 		currentRune := consumed[idx]
 
-		if inQuote {
-			if currentRune == quote {
-				inQuote = false
-				quote = rune(0)
+		if quoteState == ParserQuoteStateInSingleQuote {
+			if currentRune == '\'' {
+				quoteState = ParserQuoteStateNone
+			} else {
+				word = append(word, currentRune)
+			}
+		} else if quoteState == ParserQuoteStateInDoubleQuote {
+			if isEscaped {
+				// Only ", \ and $ have special meaning
+				if currentRune == '"' || currentRune == '\\' || currentRune == '$' {
+					word = append(word, currentRune)
+				} else {
+					word = append(word, '\\', currentRune)
+				}
+				isEscaped = false
+			} else if currentRune == '"' {
+				quoteState = ParserQuoteStateNone
+			} else if currentRune == '\\' {
+				isEscaped = true
 			} else {
 				word = append(word, currentRune)
 			}
@@ -68,9 +90,10 @@ func consumeWord(input []rune) (string, []rune) {
 			word = append(word, currentRune)
 		} else if currentRune == '\\' {
 			isEscaped = true
-		} else if currentRune == '"' || currentRune == '\'' {
-			inQuote = true
-			quote = currentRune
+		} else if currentRune == '"' {
+			quoteState = ParserQuoteStateInDoubleQuote
+		} else if currentRune == '\'' {
+			quoteState = ParserQuoteStateInSingleQuote
 		} else if isWhitespace(currentRune) && !isEscaped {
 			break
 		} else {

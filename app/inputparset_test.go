@@ -115,6 +115,22 @@ func TestParseInput(t *testing.T) {
 				Args: []string{"hello\\\"world"},
 			},
 		},
+		{
+			name:  "backslashes in doublequotes",
+			input: "echo \"hello'script'\\\\n'world\"",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"hello'script'\\n'world"},
+			},
+		},
+		{
+			name:  "escaped quotes in doublequotes",
+			input: "echo \"hello\\\"insidequotes\"script\\\"",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"hello\"insidequotesscript\""},
+			},
+		},
 	}
 	for _, test := range tests {
 		result, err := ParseInput(test.input)
