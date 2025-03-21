@@ -55,7 +55,7 @@ func consumeWord(input []rune) (string, []rune) {
 			return string(consumed), []rune{}
 		}
 
-		return string(consumed[1:endOfQuoteIdx]), consumed[endOfQuoteIdx+2:]
+		return string(consumed[1:endOfQuoteIdx]), consumed[endOfQuoteIdx+1:]
 	}
 
 	endOfWordIdx := findFirstOf(consumed, isWhitespace)
