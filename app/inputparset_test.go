@@ -28,7 +28,7 @@ func TestParseInput(t *testing.T) {
 			input: "echo 'hello''world'",
 			expected: Command{
 				Name: "echo",
-				Args: []string{"hello", "world"},
+				Args: []string{"helloworld"},
 			},
 		},
 		{

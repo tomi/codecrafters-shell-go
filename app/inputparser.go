@@ -47,23 +47,25 @@ func consumeWord(input []rune) (string, []rune) {
 		return "", consumed
 	}
 
-	firstRune := consumed[0]
-	if firstRune == '"' || firstRune == '\'' {
-		quote := firstRune
-		endOfQuoteIdx := findEndOfQuoteIdx(consumed, quote)
-		if endOfQuoteIdx == -1 {
-			return string(consumed), []rune{}
+	quote := rune(0)
+	word := []rune{}
+	idx := 0
+
+	for idx < len(consumed) {
+		currentRune := consumed[idx]
+		if currentRune == '"' || currentRune == '\'' {
+			quote = currentRune
+		} else if currentRune == quote {
+			quote = rune(0)
+		} else if isWhitespace(currentRune) {
+			break
+		} else {
+			word = append(word, currentRune)
 		}
-
-		return string(consumed[1:endOfQuoteIdx]), consumed[endOfQuoteIdx+1:]
+		idx++
 	}
 
-	endOfWordIdx := findFirstOf(consumed, isWhitespace)
-	if endOfWordIdx == -1 {
-		return string(consumed), []rune{}
-	}
-
-	return string(consumed[:endOfWordIdx]), consumed[endOfWordIdx+1:]
+	return string(word), consumed[idx:]
 }
 
 func isWhitespace(r rune) bool {
@@ -81,29 +83,4 @@ func consumeWhitespace(input []rune) []rune {
 	}
 
 	return input[idxOfNonWhitespace:]
-}
-
-func findFirstOf(input []rune, predicate func(rune) bool) int {
-	for i := 0; i < len(input); i++ {
-		if predicate(input[i]) {
-			return i
-		}
-	}
-
-	return -1
-}
-
-func findEndOfQuoteIdx(input []rune, quote rune) int {
-	previousRune := input[0]
-
-	for i := 1; i < len(input); i++ {
-		currentRune := input[i]
-		if currentRune == quote && previousRune != '\\' {
-			return i
-		}
-
-		previousRune = currentRune
-	}
-
-	return -1
 }
