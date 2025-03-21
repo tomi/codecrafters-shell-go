@@ -48,13 +48,20 @@ func consumeWord(input []rune) (string, []rune) {
 	}
 
 	inQuote := false
+	isEscaped := false
 	quote := rune(0)
 	word := []rune{}
 	idx := 0
 
 	for idx < len(consumed) {
 		currentRune := consumed[idx]
-		if inQuote {
+
+		if currentRune == '\\' {
+			isEscaped = true
+		} else if isEscaped {
+			isEscaped = false
+			word = append(word, currentRune)
+		} else if inQuote {
 			if currentRune == quote {
 				inQuote = false
 				quote = rune(0)

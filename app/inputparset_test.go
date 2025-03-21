@@ -67,6 +67,14 @@ func TestParseInput(t *testing.T) {
 				Args: []string{"hello's world"},
 			},
 		},
+		{
+			name:  "backslash",
+			input: "echo world\\ \\ \\ shell",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"world   shell"},
+			},
+		},
 	}
 
 	for _, test := range tests {
