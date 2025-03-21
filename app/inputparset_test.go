@@ -7,10 +7,12 @@ import (
 
 func TestParseInput(t *testing.T) {
 	tests := []struct {
+		name     string
 		input    string
 		expected Command
 	}{
 		{
+			name:  "single word",
 			input: "echo hello",
 			expected: Command{
 				Name: "echo",
@@ -18,6 +20,7 @@ func TestParseInput(t *testing.T) {
 			},
 		},
 		{
+			name:  "single word with singlequotes",
 			input: "echo 'hello'",
 			expected: Command{
 				Name: "echo",
@@ -25,6 +28,7 @@ func TestParseInput(t *testing.T) {
 			},
 		},
 		{
+			name:  "single word with merged quotes",
 			input: "echo 'hello''world'",
 			expected: Command{
 				Name: "echo",
@@ -32,6 +36,7 @@ func TestParseInput(t *testing.T) {
 			},
 		},
 		{
+			name:  "single word with doublequotes",
 			input: "echo \"hello\"",
 			expected: Command{
 				Name: "echo",
@@ -39,10 +44,19 @@ func TestParseInput(t *testing.T) {
 			},
 		},
 		{
+			name:  "multiple words with doublequotes",
 			input: "echo \"hello\" \"world\"",
 			expected: Command{
 				Name: "echo",
 				Args: []string{"hello", "world"},
+			},
+		},
+		{
+			name:  "single arg with multiple spaces",
+			input: "echo 'shell       hello'",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"shell       hello"},
 			},
 		},
 	}
@@ -54,10 +68,10 @@ func TestParseInput(t *testing.T) {
 		}
 
 		if result.Name != test.expected.Name {
-			t.Errorf("expected name %v, got %v", test.expected.Name, result.Name)
+			t.Errorf("%s: expected name %v, got %v", test.name, test.expected.Name, result.Name)
 		}
 		if !reflect.DeepEqual(result.Args, test.expected.Args) {
-			t.Errorf("expected args %v, got %v", test.expected.Args, result.Args)
+			t.Errorf("%s: expected args %v, got %v", test.name, test.expected.Args, result.Args)
 		}
 	}
 }
