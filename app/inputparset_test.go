@@ -59,6 +59,14 @@ func TestParseInput(t *testing.T) {
 				Args: []string{"shell       hello"},
 			},
 		},
+		{
+			name:  "singlequote in doublequotes",
+			input: "echo \"hello's world\"",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"hello's world"},
+			},
+		},
 	}
 
 	for _, test := range tests {

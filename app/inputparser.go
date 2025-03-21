@@ -47,20 +47,29 @@ func consumeWord(input []rune) (string, []rune) {
 		return "", consumed
 	}
 
+	inQuote := false
 	quote := rune(0)
 	word := []rune{}
 	idx := 0
 
 	for idx < len(consumed) {
 		currentRune := consumed[idx]
-		if currentRune == quote {
-			quote = rune(0)
-		} else if currentRune == '"' || currentRune == '\'' {
-			quote = currentRune
-		} else if isWhitespace(currentRune) && quote == rune(0) {
-			break
+		if inQuote {
+			if currentRune == quote {
+				inQuote = false
+				quote = rune(0)
+			} else {
+				word = append(word, currentRune)
+			}
 		} else {
-			word = append(word, currentRune)
+			if currentRune == '"' || currentRune == '\'' {
+				inQuote = true
+				quote = currentRune
+			} else if isWhitespace(currentRune) {
+				break
+			} else {
+				word = append(word, currentRune)
+			}
 		}
 
 		idx++
