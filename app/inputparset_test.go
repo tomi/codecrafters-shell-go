@@ -99,6 +99,22 @@ func TestParseInput(t *testing.T) {
 				Args: []string{"hel   lo"},
 			},
 		},
+		{
+			name:  "backslash in singlequotes",
+			input: "echo 'hello\\world'",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"hello\\world"},
+			},
+		},
+		{
+			name:  "backslashes in singlequotes",
+			input: "echo 'hello\\\"world'",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"hello\\\"world"},
+			},
+		},
 	}
 	for _, test := range tests {
 		result, err := ParseInput(test.input)
