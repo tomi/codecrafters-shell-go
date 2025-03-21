@@ -63,22 +63,19 @@ func consumeWord(input []rune) (string, []rune) {
 			} else {
 				word = append(word, currentRune)
 			}
+		} else if isEscaped {
+			isEscaped = false
+			word = append(word, currentRune)
+		} else if currentRune == '\\' {
+			isEscaped = true
+		} else if currentRune == '"' || currentRune == '\'' {
+			inQuote = true
+			quote = currentRune
+		} else if isWhitespace(currentRune) && !isEscaped {
+			break
 		} else {
-			if currentRune == '\\' {
-				isEscaped = true
-			} else if currentRune == '"' || currentRune == '\'' {
-				if isEscaped {
-					isEscaped = false
-					word = append(word, currentRune)
-				} else {
-					inQuote = true
-					quote = currentRune
-				}
-			} else if isWhitespace(currentRune) && !isEscaped {
-				break
-			} else {
-				word = append(word, currentRune)
-			}
+			isEscaped = false
+			word = append(word, currentRune)
 		}
 
 		idx++

@@ -75,7 +75,6 @@ func TestParseInput(t *testing.T) {
 				Args: []string{"world   shell"},
 			},
 		},
-
 		{
 			name:  "backslash in doublequotes",
 			input: "echo \"hello\\world\"",
@@ -84,8 +83,23 @@ func TestParseInput(t *testing.T) {
 				Args: []string{"hello\\world"},
 			},
 		},
+		{
+			name:  "ending newline",
+			input: "echo hello\n",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"hello"},
+			},
+		},
+		{
+			name:  "backslash with ending newline",
+			input: "echo hel\\ \\ \\ lo\n",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"hel   lo"},
+			},
+		},
 	}
-
 	for _, test := range tests {
 		result, err := ParseInput(test.input)
 		if err != nil {
