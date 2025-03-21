@@ -75,6 +75,15 @@ func TestParseInput(t *testing.T) {
 				Args: []string{"world   shell"},
 			},
 		},
+
+		{
+			name:  "backslash in doublequotes",
+			input: "echo \"hello\\world\"",
+			expected: Command{
+				Name: "echo",
+				Args: []string{"hello\\world"},
+			},
+		},
 	}
 
 	for _, test := range tests {
